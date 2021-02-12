@@ -1,3 +1,8 @@
+use postgres::{Client, NoTls};
+#[macro_use]
+extern crate fstrings;
+
+
 fn main() {
     let mut data: Vec<User> = Vec::new();
     println!("Hello, world!");
@@ -7,6 +12,28 @@ fn main() {
     data[1].username = String::from("Chris");
     data[1].active = true;
     println!("{}_{}:{}/{}", data[1].username, data[1].email, data[1].hashed_pass, data[1].active);
+    add_user("pythonz", "applesauce");
+}
+
+fn add_user(username: &str, password: &str) -> u8 { // Connect to postgres database
+    let pass  = "";
+    // postgresql://user[:password]@host[:port][/database][?param1=val1[[&param2=val2]...]]
+    let url = f!("postgres://postgres:{}@localhost:5432/rust_test", &pass);
+    let mut client = Client::connect(&url, NoTls).unwrap();
+
+
+    client.execute(
+        "INSERT INTO users (username, password) VALUES ($1, $2)",
+        &[&username, &password]
+    ).unwrap();
+
+    for row in client.query("SELECT username, password FROM users", &[]).unwrap() {
+        let username: &str = row.get(0);
+        let password: &str = row.get(1);
+
+        println!("found person: {} {:?}", username, password);
+    }
+    200
 }
 
 fn add(a: u64, b: u64) -> u64 {
