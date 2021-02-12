@@ -1,4 +1,5 @@
 use postgres::{Client, NoTls};
+
 #[macro_use]
 extern crate fstrings;
 
@@ -12,7 +13,26 @@ fn main() {
     data[1].username = String::from("Chris");
     data[1].active = true;
     println!("{}_{}:{}/{}", data[1].username, data[1].email, data[1].hashed_pass, data[1].active);
-    add_user("pythonz", "applesauce");
+    add_user("pythonz", "applesauce"); // Add user to the database
+}
+#[derive(Debug)]
+enum Gender {
+    Male,
+    Female,
+}
+impl std::fmt::Display for Gender {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+        // or, alternatively:
+        // fmt::Debug::fmt(self, f)
+    }
+}
+struct User {
+    username: String,
+    email: String,
+    hashed_pass: u128,
+    active: bool,
+    gender: Gender,
 }
 
 fn add_user(username: &str, password: &str) -> u8 { // Connect to postgres database
@@ -55,13 +75,6 @@ fn greatest_common_denominator(mut first_num: u64, mut second_num: u64) -> u64 {
 }
 
 
-struct User {
-    username: String,
-    email: String,
-    hashed_pass: u128,
-    active: bool,
-}
-
 fn mutable_data(mut data: Vec<User>) -> Vec<User> {
 
     for mut every_number in 0..10 {
@@ -72,8 +85,9 @@ fn mutable_data(mut data: Vec<User>) -> Vec<User> {
             username: String::from("none"), 
             email: String::from("default@home.com"), 
             hashed_pass: every_number, 
-            active: false};
-        println!("{}_{}:{}/{}", user.username, user.email, user.hashed_pass, user.active);
+            active: false,
+            gender: Gender::Female};
+        println!("{}({})_{}:{}/{}", user.username, user.gender, user.email, user.hashed_pass, user.active);
         data.push(user);
     }
     return data;
